@@ -11,6 +11,9 @@ def main():
   
   run = True
   getOptions()
+  if args.reset:
+    resetOutput()
+
   while run: 
     getPlayers()
     pause = False
@@ -26,11 +29,17 @@ def getOptions():
   parser.add_argument('--version', action='version', version='%(prog)s 2.0 -- the uprgade from BASH')
   args = parser.parse_args()
 
+def resetOutput():
+  print('resetOutput')
+  reset = input('Are you sure you want to erase the output files?')
+  print('reset files ...')
+
 def getPlayers():
+   print('getplayers')
   
-    
-  
-  
+def go():
+  print('go')
+ 
 
 if __name__ == '__main__':
   main()
