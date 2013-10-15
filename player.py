@@ -56,7 +56,7 @@ class Player:
       self.ip = ip_address(ip)
     except ValueError as err:
       sys.stderr.write('---ERROR---\n' + str(err) + '\n')
-      var = input('Would you like to correct this? ')
+      var = input('Would you like to correct this? [y/n]: ')
       if var == 'n' or var == 'no':
         self.ip = '0.0.0.0'
       else:
@@ -65,7 +65,14 @@ class Player:
   def setID(self, idd):
     self.idd = idd
 
-    
+  def getName(self):
+    return self.name
+
+  def getTeam(self):
+    return self.team
+
+  def getIP(self):
+    return self.ip
     
 if __name__ == '__main__':
   main()

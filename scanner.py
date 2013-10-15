@@ -4,8 +4,11 @@ from ipaddress import *
 import argparse
 import sys
 import re
+import time
 
 args = []
+players = []
+
 
 def main():
   
@@ -13,16 +16,38 @@ def main():
   getOptions()
   if args.reset:
     resetOutput()
-
+  if args.verbose:
+    printPlayers()
+  getPlayers()
   while run: 
-    getPlayers()
     pause = False
-    while not pause:
-      go()
+    try:
+      while not pause:
+        go()
+        time.sleep(3)
+        #time.sleep(60)
+    except KeyboardInterrupt:
+      userpause = input('\n---Game Paused---\n'\
+                        'Press \'s\' to stop\n'\
+                        'Press \'e\' to edit or add a player\n'\
+                        'Press \'d\' to delete a player\n'\
+                        'Press anything else to continue: ')
+      if userpause == 's':
+        pause = True
+        run = False
+      if userpause =='e':
+        manuallyEnter(True)
+        print('edit add player')
+      if userpause == 'd':
+        deletePlayer()
+        print('deleteplayer')
+ 
+ #-----------END MAIN------------------
 
 def getOptions():
   global args
   parser = argparse.ArgumentParser(description='Option Getter module for CDX\n Files are automatically written out\n Files written to include ... ... ...')
+  parser.add_argument('-a', '--autorun', dest='autorun', action='store_true', default=False , help='Automatically start running - should be used with -i')
   parser.add_argument('-i', '--input', dest='file', action='store_true', default=False , help='Read in players from \"players.config\"')
   parser.add_argument('-r', '--reset', dest='reset', action='store_true', default=False, help='Resets all output files')
   parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False, help='Turn on Verbose Output')
@@ -31,12 +56,84 @@ def getOptions():
 
 def resetOutput():
   print('resetOutput')
-  reset = input('Are you sure you want to erase the output files?')
+  reset = input('Are you sure you want to erase the output files? [y/n]')
   print('reset files ...')
 
 def getPlayers():
-   print('getplayers')
+  global players
+  if args.file:
+    try:
+      with open('players.config', 'r') as f:
+        for line in f:
+          if line[0] == '#':
+            continue
+          p = Player()
+          parsed = re.split(' |,|;|:|-|\n', line)
+          parsed =  list(filter(None, parsed))
+          p.setName(parsed.pop(0).capitalize())
+          try:
+            p.setTeam(parsed.pop(0).capitalize())
+          
+          except IndexError as err:
+          #only name arguments given no team -- assume whitecell
+            p.team = 'white'.capitalize()
+            sys.stderr.write('---WARNING---\nNo Team given for Player: '
+                             + str(p.name) + '\nSetting to White\n')
+          try:
+            p.setIP(parsed.pop(0))
+          except IndexError as err:
+          #only name arguments given no IP -- assume 0.0.0.0
+            p.setIP('0.0.0.0')
+            sys.stderr.write('---WARNING---\nNo IP given for Player: '
+                            + str(p.name) + '\nSetting to 0.0.0.0\n')
+          players.append(p)
+      for text in players:
+        print(text)
+    except FileNotFoundError as readerr:
+      sys.stderr.write('File Not Found\n' + str(readerr) + '\n')
+#end read in file
+  if not args.autorun:
+    manuallyEnter(False)
+
+def manuallyEnter(edit):
+  if args.file or edit:
+    more = input('Do you want to enter more players? [y/n]: ')
+    if more =='y' or more == 'yes':
+      p = Player()
+      p.setName(input('Enter Player Name: '))
+      p.setTeam(input('Enter Team: '))
+      p.setIP(input('Enter IP: '))
+      players.append(p)
   
+  if not args.file:
+    p = Player()
+    p.setName(input('Enter Player Name: '))
+    p.setTeam(input('Enter Team: '))
+    p.setIP(input('Enter IP: '))
+    players.append(p)
+
+  if edit:
+    ed = input('Do you want to edit the players? [y/n]: ')
+    if ed == 'y' or ed == 'yes':
+      printPlayers()
+      him = input('Who? ')
+      for player in players:
+        if player.getName() == him:
+          player.setName(input('Enter Player Name: '))
+          player.setTeam(input('Enter Team: '))
+          player.setIP(input('Enter IP: '))
+        else:
+          print('Sorry couldn\'t find', him)
+          
+
+  see = input('Want to see the roster? [y/n]: ')
+  if see =='y' or see == 'yes':
+    printPlayers()
+
+def printPlayers():
+  for player in players:
+    print(player)
+
 def go():
   print('go')
  
