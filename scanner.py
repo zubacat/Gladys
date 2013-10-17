@@ -16,9 +16,9 @@ def main():
   getOptions()
   if args.reset:
     resetOutput()
+  getPlayers()
   if args.verbose:
     printPlayers()
-  getPlayers()
   while run: 
     pause = False
     try:
@@ -35,14 +35,16 @@ def main():
       if userpause == 's':
         pause = True
         run = False
-      if userpause =='e':
+        print('finishing writing files')
+      elif userpause =='e':
         manuallyEnter(True)
-        print('edit add player')
-      if userpause == 'd':
-        deletePlayer()
+      elif userpause == 'd':
+        #deletePlayer()
         print('deleteplayer')
+      else:
+        print('---Game Resumed---')
  
- #-----------END MAIN------------------
+#-----------END MAIN------------------
 
 def getOptions():
   global args
@@ -70,13 +72,13 @@ def getPlayers():
           p = Player()
           parsed = re.split(' |,|;|:|-|\n', line)
           parsed =  list(filter(None, parsed))
-          p.setName(parsed.pop(0).capitalize())
+          p.setName(parsed.pop(0))
           try:
-            p.setTeam(parsed.pop(0).capitalize())
+            p.setTeam(parsed.pop(0))
           
           except IndexError as err:
           #only name arguments given no team -- assume whitecell
-            p.team = 'white'.capitalize()
+            p.team = 'white'
             sys.stderr.write('---WARNING---\nNo Team given for Player: '
                              + str(p.name) + '\nSetting to White\n')
           try:
@@ -87,13 +89,13 @@ def getPlayers():
             sys.stderr.write('---WARNING---\nNo IP given for Player: '
                             + str(p.name) + '\nSetting to 0.0.0.0\n')
           players.append(p)
-      for text in players:
-        print(text)
     except FileNotFoundError as readerr:
       sys.stderr.write('File Not Found\n' + str(readerr) + '\n')
-#end read in file
+
   if not args.autorun:
     manuallyEnter(False)
+
+#---END read in file---
 
 def manuallyEnter(edit):
   if args.file or edit:
@@ -105,7 +107,7 @@ def manuallyEnter(edit):
       p.setIP(input('Enter IP: '))
       players.append(p)
   
-  if not args.file:
+  if not args.file and not edit:
     p = Player()
     p.setName(input('Enter Player Name: '))
     p.setTeam(input('Enter Team: '))
@@ -117,7 +119,10 @@ def manuallyEnter(edit):
     if ed == 'y' or ed == 'yes':
       printPlayers()
       him = input('Who? ')
+      him = him.capitalize()
       for player in players:
+        print('Player',player.getName())
+        print('Him',him)
         if player.getName() == him:
           player.setName(input('Enter Player Name: '))
           player.setTeam(input('Enter Team: '))

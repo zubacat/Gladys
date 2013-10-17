@@ -46,10 +46,10 @@ class Player:
     return False
 
   def setName(self, name):
-    self.name = name
+    self.name = name.capitalize()
 
   def setTeam(self, team):
-    self.team = team
+    self.team = team.capitalize()
 
   def setIP(self, ip):
     try:
