@@ -27,22 +27,25 @@ def main():
         time.sleep(3)
         #time.sleep(60)
     except KeyboardInterrupt:
-      userpause = input('\n---Game Paused---\n'\
-                        'Press \'s\' to stop\n'\
-                        'Press \'e\' to edit or add a player\n'\
-                        'Press \'d\' to delete a player\n'\
-                        'Press anything else to continue: ')
-      if userpause == 's':
-        pause = True
-        run = False
-        print('finishing writing files')
-      elif userpause =='e':
-        manuallyEnter(True)
-      elif userpause == 'd':
-        #deletePlayer()
-        print('deleteplayer')
-      else:
-        print('---Game Resumed---')
+      while True:  
+        userpause = input('\n\n---Game Paused---\n\n'\
+                          'Press \'s\' to stop\n'\
+                          'Press \'e\' to edit or add a player\n'\
+                          'Press \'d\' to delete a player\n'\
+                          'Press anything else to continue: ')
+        if userpause == 's':
+          pause = True
+          run = False
+          print('finishing writing files')
+          break
+        elif userpause =='e':
+          manuallyEnter(True)
+        elif userpause == 'd':
+          #deletePlayer()
+          print('deleteplayer')
+        else:
+          print('\n---Game Resumed---\n\n')
+          break
  
 #-----------END MAIN------------------
 
@@ -100,12 +103,16 @@ def getPlayers():
 def manuallyEnter(edit):
   if args.file or edit:
     more = input('Do you want to enter more players? [y/n]: ')
-    if more =='y' or more == 'yes':
-      p = Player()
-      p.setName(input('Enter Player Name: '))
-      p.setTeam(input('Enter Team: '))
-      p.setIP(input('Enter IP: '))
-      players.append(p)
+    while True:  
+      if more =='y' or more == 'yes':
+        p = Player()
+        p.setName(input('Enter Player Name: '))
+        p.setTeam(input('Enter Team: '))
+        p.setIP(input('Enter IP: '))
+        players.append(p)
+        more = input('Do you want to enter more players? [y/n]: ')
+      else:
+        break
   
   if not args.file and not edit:
     p = Player()
@@ -113,27 +120,31 @@ def manuallyEnter(edit):
     p.setTeam(input('Enter Team: '))
     p.setIP(input('Enter IP: '))
     players.append(p)
+    manuallyEnter(True)
 
   if edit:
     ed = input('Do you want to edit the players? [y/n]: ')
-    if ed == 'y' or ed == 'yes':
-      printPlayers()
-      him = input('Who? ')
-      him = him.capitalize()
-      for player in players:
-        print('Player',player.getName())
-        print('Him',him)
-        if player.getName() == him:
-          player.setName(input('Enter Player Name: '))
-          player.setTeam(input('Enter Team: '))
-          player.setIP(input('Enter IP: '))
-        else:
+    while True:
+      if ed == 'y' or ed == 'yes':
+        printPlayers()
+        him = input('Who? ')
+        him = him.capitalize()
+        found = False
+        for player in players:
+          if player.getName() == him:
+            print('Editing player: ', player.getName())
+            player.setName(input('Enter New Player Name: '))
+            player.setTeam(input('Enter New Team: '))
+            player.setIP(input('Enter New IP: '))
+            found = True
+        if not found:
           print('Sorry couldn\'t find', him)
-          
-
-  see = input('Want to see the roster? [y/n]: ')
-  if see =='y' or see == 'yes':
-    printPlayers()
+        ed = input('Do you want to edit more players? [y/n]: ')
+      else:
+        see = input('Want to see the roster? [y/n]: ')
+        if see =='y' or see == 'yes':
+          printPlayers()
+        break
 
 def printPlayers():
   for player in players:
