@@ -9,7 +9,7 @@ import time
 args = []
 players = []
 
-
+#-------BEGIN MAIN----------
 def main():
   
   run = True
@@ -49,6 +49,8 @@ def main():
  
 #-----------END MAIN------------------
 
+
+#---------BEGIN GETTING OPTIONS-------
 def getOptions():
   global args
   parser = argparse.ArgumentParser(description='Option Getter module for CDX\n Files are automatically written out\n Files written to include ... ... ...')
@@ -145,6 +147,26 @@ def manuallyEnter(edit):
         if see =='y' or see == 'yes':
           printPlayers()
         break
+
+def deletePlayer():
+  found = False
+    while not found:
+      printPlayers()
+      him = input('\nDelete Player: Who? ')
+      him = him.capitalize()
+      for i, player in enumerate(players):
+        if player.getName() == him:
+          print('Deleting player: ', player.getName())
+          players.remove(i)
+          found = True
+      if not found:
+        print('Sorry couldn\'t find', him)
+        see = input('Want to see the roster? [y/n]: ')
+        if see =='y' or see == 'yes':
+          printPlayers()
+        break
+
+
 
 def printPlayers():
   for player in players:
