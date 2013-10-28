@@ -30,6 +30,7 @@ def main():
       while True:  
         userpause = input('\n\n---Game Paused---\n\n'\
                           'Press \'s\' to stop\n'\
+                          'Press \'l\' to see the leaderboard\n'\
                           'Press \'e\' to edit or add a player\n'\
                           'Press \'d\' to delete a player\n'\
                           'Press anything else to continue: ')
@@ -38,11 +39,12 @@ def main():
           run = False
           print('finishing writing files')
           break
-        elif userpause =='e':
+        elif userpause == 'l':
+          print('show leaderboard')
+        elif userpause == 'e':
           manuallyEnter(True)
         elif userpause == 'd':
-          #deletePlayer()
-          print('deleteplayer')
+          deletePlayer()
         else:
           print('\n---Game Resumed---\n\n')
           break
@@ -147,25 +149,28 @@ def manuallyEnter(edit):
         if see =='y' or see == 'yes':
           printPlayers()
         break
+#--------------------END Enter Player-------------------
+
 
 def deletePlayer():
   found = False
-    while not found:
-      printPlayers()
-      him = input('\nDelete Player: Who? ')
-      him = him.capitalize()
-      for i, player in enumerate(players):
-        if player.getName() == him:
-          print('Deleting player: ', player.getName())
-          players.remove(i)
-          found = True
-      if not found:
-        print('Sorry couldn\'t find', him)
-        see = input('Want to see the roster? [y/n]: ')
-        if see =='y' or see == 'yes':
-          printPlayers()
+  while not found:
+    printPlayers()
+    him = input('\nDelete Player: Who? ')
+    him = him.capitalize()
+    for i, player in enumerate(players):
+      if player.getName() == him:
+        print('Deleting player: ', player.getName())
+        players.remove(i)
+        found = True
+    if not found:
+      print('Sorry couldn\'t find', him)
+      again = input('Try again? [y/n]')
+      if again =='n' or again == 'no':
         break
-
+      see = input('Want to see the roster? [y/n]: ')
+      if see =='y' or see == 'yes':
+        printPlayers()
 
 
 def printPlayers():
