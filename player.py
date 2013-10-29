@@ -31,7 +31,6 @@ class Player:
       raise StopIteration
 
   def __str__(self):
-
     return 'Name: {0} Team: {1} IP: {2}'.format(self.name, self.team, self.ip)
   
   def __eq__(self, other):

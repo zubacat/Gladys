@@ -29,11 +29,11 @@ def main():
     except KeyboardInterrupt:
       while True:  
         userpause = input('\n\n---Game Paused---\n\n'\
-                          'Press \'s\' to stop\n'\
-                          'Press \'l\' to see the leaderboard\n'\
-                          'Press \'e\' to edit or add a player\n'\
-                          'Press \'d\' to delete a player\n'\
-                          'Press anything else to continue: ')
+                          'Enter \'s\' to stop\n'\
+                          'Enter \'l\' to see the leaderboard\n'\
+                          'Enter \'e\' to edit or add a player\n'\
+                          'Enter \'d\' to delete a player\n'\
+                          'Enter anything else to continue: ')
         if userpause == 's':
           pause = True
           run = False
@@ -160,8 +160,7 @@ def deletePlayer():
     him = him.capitalize()
     for i, player in enumerate(players):
       if player.getName() == him:
-        print('Deleting player: ', player.getName())
-        players.remove(i)
+        print('Deleting player:', players.pop(i).getName())
         found = True
     if not found:
       print('Sorry couldn\'t find', him)
@@ -171,7 +170,7 @@ def deletePlayer():
       see = input('Want to see the roster? [y/n]: ')
       if see =='y' or see == 'yes':
         printPlayers()
-
+#-----------------END Delete Player-----------------
 
 def printPlayers():
   for player in players:
