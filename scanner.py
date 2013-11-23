@@ -10,6 +10,7 @@ import string
 import subprocess
 import urllib.request
 
+#the argument inputs and a list of players
 args = []
 players = []
 
@@ -64,14 +65,23 @@ def getOptions():
 # parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False, help='Turn on Verbose Output')
   parser.add_argument('--version', action='version', version='%(prog)s 2.0 -- the uprgade from BASH')
   args = parser.parse_args()
+#--------END GETTING OPTIONS--------
 
+#--------RESET OUTPUT FILES--------
+#Resets the output files by blanking them
 def resetOutput():
   print('resetOutput')
   reset = input('Are you sure you want to erase the output files? [y/n]')
   print('reset files ...')
 
+#---------- GET PLAYERS--------
+#reads in the player file players.config
+#pareses on SPACE , ; : - \n 
+#filters out '' - aka NONE
+#only needs a name to work
 def getPlayers():
   global players
+  #args.file is cmd line option
   if args.file:
     try:
       with open('players.config', 'r') as f:
@@ -101,12 +111,24 @@ def getPlayers():
     except FileNotFoundError as readerr:
       sys.stderr.write('File Not Found\n' + str(readerr) + '\n')
 
+  #autorun is cmd line option
   if not args.autorun:
     manuallyEnter(False)
 
-#---END read in file---
+#---------END GET PLAYERS---------
 
+#-------MANUALLY ENTER PLAYERS----
+#INPUT -> edit 
+#if the game is paused edit = TRUE
+#else it means the game is just starting
+#
+#Some of the if statements get a little
+#confusing but it works from what I can tell
+#
 def manuallyEnter(edit):
+  #if a file was read in
+  #do you want to enter more players?
+  #or if this is edit to you want to...
   if args.file or edit:
     more = input('Do you want to enter more players? [y/n]: ')
     while True:  
@@ -119,7 +141,10 @@ def manuallyEnter(edit):
         more = input('Do you want to enter more players? [y/n]: ')
       else:
         break
-  
+
+  #if a file was not read in
+  #and this is not an edit
+  #you need to enter players
   if not args.file and not edit:
     p = Player()
     p.setName(input('Enter Player Name: '))
@@ -128,6 +153,7 @@ def manuallyEnter(edit):
     players.append(p)
     manuallyEnter(True)
 
+  #if this is an edit, hey guess what?
   if edit:
     ed = input('Do you want to edit the players? [y/n]: ')
     while True:
@@ -151,9 +177,9 @@ def manuallyEnter(edit):
         if see =='y' or see == 'yes':
           printPlayers()
         break
-#--------------------END Enter Player-------------------
+#------------END Enter Player-------------
 
-
+#-----------DELETE PLAYER-----------
 def deletePlayer():
   found = False
   while not found:
@@ -174,18 +200,25 @@ def deletePlayer():
         printPlayers()
 #-----------------END Delete Player-----------------
 
+#prints the players how they were entered
 def printPlayers():
   for player in players:
     print(player)
 
+#print the top score player first
 def leaderboard():
   leaders = sorted(players, key=lambda p: p.score, reverse=True)
   print('\nLeaderboard:\n')
   for leader in leaders:
     print(leader)
 
+#---------SCAN-------
+#Scans the given ports
+#so far only 3 ports prog
+#FTP should probably use netcat
+#or a read ftp client
+#the socket doesn't always work...
 def scan():
-  print('go')
   ports = (21, 22, 80)
   for player in players:
     time.sleep(.05)
@@ -220,6 +253,7 @@ def scan():
         try:        
           http = urllib.request.urlopen('http://{0}'.format(player.getIPstring()), None, 1)
           html = http.read().decode('utf-8')
+          #strip html tags
           text = re.sub(r'(<!--.*?-->|<[^>]*>)', '', html)
           cleantext = re.sub(r'\n', ' ', text)
           search(cleantext)
@@ -228,7 +262,13 @@ def scan():
               + str(player.getName()) + ' at IP: '+ str(player.getIPstring())\
               + ':' + str(port)  + '\n')
 
-
+#-----------SCORE----------
+#This is the scoring engine
+#it takes in a reply from a port scan
+#and parses it for any players name
+#in the reply
+#this mean multiple people can get
+#points for on a machine
 def search(reply):
   print(reply)
   for player in players:
