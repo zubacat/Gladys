@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 import sys
+import string
 from ipaddress import *
 def main():
   print('In main')
 
 class Player:
-  def __init__(self, name = None, team = None, ip = None, idd = None):
+  def __init__(self, name = None, team = None, ip = None):
     
     self.name = 'error'
     self.team = 'error'
     self.ip = ip_address('0.0.0.0')
-    self.idd = 0
+    self.score = 0
     self.iterate = 0
 
   def __iter__(self):
@@ -31,7 +32,7 @@ class Player:
       raise StopIteration
 
   def __str__(self):
-    return 'Name: {0} Team: {1} IP: {2}'.format(self.name, self.team, self.ip)
+    return 'Name: {0} Team: {1} IP: {2} Score: {3}'.format(self.name, self.team, self.ip, self.score)
   
   def __eq__(self, other):
     return (self.name == other.name and self.team == other.team and
@@ -45,10 +46,10 @@ class Player:
     return False
 
   def setName(self, name):
-    self.name = name.capitalize()
+    self.name = string.capwords(name)
 
   def setTeam(self, team):
-    self.team = team.capitalize()
+    self.team = string.capwords(team)
 
   def setIP(self, ip):
     try:
@@ -61,8 +62,14 @@ class Player:
       else:
        self.setIP(input('Enter IP: '))
 
-  def setID(self, idd):
-    self.idd = idd
+  def addOneScore(self):
+    self.score += 1
+
+  def setScore(self, score):
+    self.score = score
+
+  def resetScore(self):
+    self.score = 0
 
   def getName(self):
     return self.name
@@ -72,6 +79,12 @@ class Player:
 
   def getIP(self):
     return self.ip
-    
+  
+  def getIPstring(self):
+    return '{0}'.format(self.ip)
+
+  def getScore(self):
+    return self.score
+
 if __name__ == '__main__':
   main()

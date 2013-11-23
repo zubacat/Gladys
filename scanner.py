@@ -5,6 +5,10 @@ import argparse
 import sys
 import re
 import time
+import socket
+import string
+import subprocess
+import urllib.request
 
 args = []
 players = []
@@ -17,14 +21,12 @@ def main():
   if args.reset:
     resetOutput()
   getPlayers()
-  if args.verbose:
-    printPlayers()
   while run: 
     pause = False
     try:
       while not pause:
-        go()
-        time.sleep(3)
+        scan()
+        time.sleep(10)
         #time.sleep(60)
     except KeyboardInterrupt:
       while True:  
@@ -40,7 +42,7 @@ def main():
           print('finishing writing files')
           break
         elif userpause == 'l':
-          print('show leaderboard')
+          leaderboard()
         elif userpause == 'e':
           manuallyEnter(True)
         elif userpause == 'd':
@@ -55,11 +57,11 @@ def main():
 #---------BEGIN GETTING OPTIONS-------
 def getOptions():
   global args
-  parser = argparse.ArgumentParser(description='Option Getter module for CDX\n Files are automatically written out\n Files written to include ... ... ...')
+  parser = argparse.ArgumentParser(description='CDX\n  Files are automatically written out\n Files written to include ... ... ...')
   parser.add_argument('-a', '--autorun', dest='autorun', action='store_true', default=False , help='Automatically start running - should be used with -i')
   parser.add_argument('-i', '--input', dest='file', action='store_true', default=False , help='Read in players from \"players.config\"')
   parser.add_argument('-r', '--reset', dest='reset', action='store_true', default=False, help='Resets all output files')
-  parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False, help='Turn on Verbose Output')
+# parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False, help='Turn on Verbose Output')
   parser.add_argument('--version', action='version', version='%(prog)s 2.0 -- the uprgade from BASH')
   args = parser.parse_args()
 
@@ -132,7 +134,7 @@ def manuallyEnter(edit):
       if ed == 'y' or ed == 'yes':
         printPlayers()
         him = input('Who? ')
-        him = him.capitalize()
+        him = string.capwords(him)
         found = False
         for player in players:
           if player.getName() == him:
@@ -157,7 +159,7 @@ def deletePlayer():
   while not found:
     printPlayers()
     him = input('\nDelete Player: Who? ')
-    him = him.capitalize()
+    him = string.capwords(him)
     for i, player in enumerate(players):
       if player.getName() == him:
         print('Deleting player:', players.pop(i).getName())
@@ -176,9 +178,62 @@ def printPlayers():
   for player in players:
     print(player)
 
-def go():
+def leaderboard():
+  leaders = sorted(players, key=lambda p: p.score, reverse=True)
+  print('\nLeaderboard:\n')
+  for leader in leaders:
+    print(leader)
+
+def scan():
   print('go')
- 
+  ports = (21, 22, 80)
+  for player in players:
+    time.sleep(.05)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(1)
+    for port in ports:
+      if port == 21:
+        #ftp
+        sockcon = sock.connect_ex((player.getIPstring(), port))
+        if sockcon == 0:
+          ftpbanner = sock.recv(4096).decode('utf-8')
+          search(string.capwords(ftpbanner))
+          sock.send(bytes('QUIT\n', 'utf-8'))
+          sock.close()
+        else:
+          sys.stderr.write('---WARNING---\nUnable to scan: '\
+              + str(player.getName()) + ' at IP: '+ str(player.getIPstring())\
+              + ':' + str(port)  + '\n')
+      if port == 22:
+        #ssh
+        try:
+          stream = subprocess.Popen('ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -o PubkeyAuthentication=no {0}'.format(player.getIPstring()) , shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+          sshbanner = stream.communicate()
+          sshbanner = sshbanner[0].decode("utf-8") +' '+ sshbanner[1].decode("utf-8")
+          search(string.capwords(sshbanner))
+        except:
+          sys.stderr.write('---WARNING---\nUnable to scan: '\
+              + str(player.getName()) + ' at IP: '+ str(player.getIPstring())\
+              + ':' + str(port)  + '\n')
+
+      if port ==80:
+        try:        
+          http = urllib.request.urlopen('http://{0}'.format(player.getIPstring()), None, 1)
+          html = http.read().decode('utf-8')
+          text = re.sub(r'(<!--.*?-->|<[^>]*>)', '', html)
+          cleantext = re.sub(r'\n', ' ', text)
+          search(cleantext)
+        except:
+          sys.stderr.write('---WARNING---\nUnable to scan: '\
+              + str(player.getName()) + ' at IP: '+ str(player.getIPstring())\
+              + ':' + str(port)  + '\n')
+
+
+def search(reply):
+  print(reply)
+  for player in players:
+    if (reply.find(player.getName()) != -1):
+      player.addOneScore()
 
 if __name__ == '__main__':
   main()
