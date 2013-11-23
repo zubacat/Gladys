@@ -2,6 +2,9 @@
 #Mine
 sratch/
 
+#Gedit crap for saving
+*~
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
