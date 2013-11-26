@@ -1,6 +1,8 @@
 #Python ignore
 #Mine
 scratch/
+scores.txt
+players.config.*
 
 #Gedit crap for saving
 *~

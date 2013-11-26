@@ -40,7 +40,7 @@ def main():
         if userpause == 's':
           pause = True
           run = False
-          print('finishing writing files')
+          writeFiles()
           break
         elif userpause == 'l':
           leaderboard()
@@ -270,10 +270,19 @@ def scan():
 #this mean multiple people can get
 #points for on a machine
 def search(reply):
-  print(reply)
   for player in players:
     if (reply.find(player.getName()) != -1):
       player.addOneScore()
+
+def writeFiles():
+  leaders = sorted(players, key=lambda p: p.score, reverse=True)
+  with open('scores.txt', 'w') as file:
+    for leader in leaders:
+      file.write('{0}\n'.format(leader))
+  with open('players.config.end', 'w') as file:
+    for player in players:
+      file.write('{0}\n'.format(player))
+
 
 if __name__ == '__main__':
   main()
