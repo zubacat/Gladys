@@ -4,8 +4,9 @@ scratch/
 scores.txt
 players.config.*
 
-#Gedit crap for saving
+#Gedit, vim crap for saving
 *~
+*.swp
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
