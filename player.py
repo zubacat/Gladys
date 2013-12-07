@@ -11,7 +11,7 @@ class Player:
     self.name = 'error'
     self.team = 'error'
     self.ip = ip_address('0.0.0.0')
-    self.score = 0
+    self.score = [0]
     self.iterate = 0
 
   def __iter__(self):
@@ -32,7 +32,7 @@ class Player:
       raise StopIteration
 
   def __str__(self):
-    return 'Name: {0} Team: {1} IP: {2} Score: {3}'.format(self.name, self.team, self.ip, self.score)
+    return 'Name: {0} Team: {1} IP: {2} Score: {3}'.format(self.name, self.team, self.ip, self.score[0])
   
   def __eq__(self, other):
     return (self.name == other.name and self.team == other.team and
@@ -41,9 +41,6 @@ class Player:
   def __ne__(self, other):
     return (self.name != other.name and self.team != other.team and
             self.ip != other.ip)
-
-  def __lt__(self, other):
-    return False
 
   def setName(self, name):
     self.name = string.capwords(name)
@@ -58,18 +55,18 @@ class Player:
       sys.stderr.write('---ERROR---\n' + str(err) + '\n')
       var = input('Would you like to correct this? [y/n]: ')
       if var == 'n' or var == 'no':
-        self.ip = '0.0.0.0'
+        self.ip = ip_address('0.0.0.0') 
       else:
        self.setIP(input('Enter IP: '))
 
   def addOneScore(self):
-    self.score += 1
+    self.score.insert(0, self.score[0] + 1)
 
   def setScore(self, score):
-    self.score = score
+    self.score.insert(0, score)
 
   def resetScore(self):
-    self.score = 0
+    self.score = [0]
 
   def getName(self):
     return self.name
@@ -84,6 +81,9 @@ class Player:
     return '{0}'.format(self.ip)
 
   def getScore(self):
+    return self.score[0]
+
+  def getScores(self):
     return self.score
 
 if __name__ == '__main__':

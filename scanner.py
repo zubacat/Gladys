@@ -9,6 +9,8 @@ import socket
 import string
 import subprocess
 import urllib.request
+from ftplib import FTP
+
 
 #the argument inputs and a list of players
 args = []
@@ -221,46 +223,46 @@ def leaderboard():
 def scan():
   ports = (21, 22, 80)
   for player in players:
-    time.sleep(.05)
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(1)
-    for port in ports:
-      if port == 21:
-        #ftp
-        sockcon = sock.connect_ex((player.getIPstring(), port))
-        if sockcon == 0:
-          ftpbanner = sock.recv(4096).decode('utf-8')
-          search(string.capwords(ftpbanner))
-          sock.send(bytes('QUIT\n', 'utf-8'))
-          sock.close()
-        else:
-          sys.stderr.write('---WARNING---\nUnable to scan: '\
-              + str(player.getName()) + ' at IP: '+ str(player.getIPstring())\
-              + ':' + str(port)  + '\n')
-      if port == 22:
-        #ssh
-        try:
-          stream = subprocess.Popen('ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no -o PubkeyAuthentication=no {0}'.format(player.getIPstring()) , shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-          sshbanner = stream.communicate()
-          sshbanner = sshbanner[0].decode("utf-8") +' '+ sshbanner[1].decode("utf-8")
-          search(string.capwords(sshbanner))
-        except:
-          sys.stderr.write('---WARNING---\nUnable to scan: '\
-              + str(player.getName()) + ' at IP: '+ str(player.getIPstring())\
-              + ':' + str(port)  + '\n')
+    if not ( player.getIP().is_loopback or\
+           (player.getIP() == ip_address('0.0.0.1'))):
+        time.sleep(.05)
+#       sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#       sock.settimeout(1)
+        for port in ports:
+          if port == 21:
+            #ftp
+            try:
+              ftp = FTP(player.getIPstring(), timeout=1)
+              search(ftp.welcome())
+              quit = ftp.quit()
+            except:
+              sys.stderr.write('---WARNING---\nUnable to scan: '\
+                  + str(player.getName()) + ' at IP: '+ str(player.getIPstring())\
+                  + ':' + str(port)  + '\n')
+          if port == 22:
+            #ssh
+            try:
+              stream = subprocess.Popen('ssh -o ConnectTimeout=1 -o StrictHostKeyChecking=no -o PasswordAuthentication=no -o PubkeyAuthentication=no {0}'.format(player.getIPstring()) , shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+              sshbanner = stream.communicate()
+              sshbanner = sshbanner[0].decode("utf-8") +' '+ sshbanner[1].decode("utf-8")
+              search(string.capwords(sshbanner))
+            except:
+              sys.stderr.write('---WARNING---\nUnable to scan: '\
+                  + str(player.getName()) + ' at IP: '+ str(player.getIPstring())\
+                  + ':' + str(port)  + '\n')
 
-      if port ==80:
-        try:        
-          http = urllib.request.urlopen('http://{0}'.format(player.getIPstring()), None, 1)
-          html = http.read().decode('utf-8')
-          #strip html tags
-          text = re.sub(r'(<!--.*?-->|<[^>]*>)', '', html)
-          cleantext = re.sub(r'\n', ' ', text)
-          search(cleantext)
-        except:
-          sys.stderr.write('---WARNING---\nUnable to scan: '\
-              + str(player.getName()) + ' at IP: '+ str(player.getIPstring())\
-              + ':' + str(port)  + '\n')
+          if port ==80:
+            try:        
+              http = urllib.request.urlopen('http://{0}'.format(player.getIPstring()), None, 1)
+              html = http.read().decode('utf-8')
+              #strip html tags
+              text = re.sub(r'(<!--.*?-->|<[^>]*>)', '', html)
+              cleantext = re.sub(r'\n', ' ', text)
+              search(cleantext)
+            except:
+              sys.stderr.write('---WARNING---\nUnable to scan: '\
+                  + str(player.getName()) + ' at IP: '+ str(player.getIPstring())\
+                  + ':' + str(port)  + '\n')
 
 #-----------SCORE----------
 #This is the scoring engine
@@ -279,10 +281,16 @@ def writeFiles():
   with open('scores.txt', 'w') as file:
     for leader in leaders:
       file.write('{0}\n'.format(leader))
+  with open('scores.csv', 'w') as file:
+    for leader in leaders:
+      file.write('{0},{1}'.format(leader.getName(), leader.getTeam()))
+      scores = leader.getScores()
+      for score in scores:
+        file.write(',{0}'.format(score))
+      file.write('\n')
   with open('players.config.end', 'w') as file:
     for player in players:
-      file.write('{0}\n'.format(player))
-
+      file.write('{0} {1} {2}\n'.format(player.getName(), player.getTeam(), player.getIPstring()))
 
 if __name__ == '__main__':
   main()
