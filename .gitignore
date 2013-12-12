@@ -3,7 +3,7 @@
 scratch/
 scores.txt
 players.config.*
-*.cvs
+*.csv
 #Gedit, vim crap for saving
 *~
 *.swp
