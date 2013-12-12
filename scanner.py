@@ -34,12 +34,12 @@ def main():
     except KeyboardInterrupt:
       while True:  
         userpause = input('\n\n---Game Paused---\n\n'\
-                          'Enter \'s\' to stop\n'\
+                          'Enter \'q\' to quit\n'\
                           'Enter \'l\' to see the leaderboard\n'\
                           'Enter \'e\' to edit or add a player\n'\
                           'Enter \'d\' to delete a player\n'\
                           'Enter anything else to continue: ')
-        if userpause == 's':
+        if userpause == 'q':
           pause = True
           run = False
           writeFiles()
@@ -53,7 +53,7 @@ def main():
         else:
           print('\n---Game Resumed---\n\n')
           break
- 
+      writeRoundScores() 
 #-----------END MAIN------------------
 
 
@@ -224,7 +224,7 @@ def scan():
   ports = (21, 22, 80)
   for player in players:
     if not ( player.getIP().is_loopback or\
-           (player.getIP() == ip_address('0.0.0.1'))):
+           (player.getIP() == ip_address('0.0.0.0'))):
         time.sleep(.05)
 #       sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #       sock.settimeout(1)
@@ -233,7 +233,7 @@ def scan():
             #ftp
             try:
               ftp = FTP(player.getIPstring(), timeout=1)
-              search(ftp.welcome())
+              search(ftp.getwelcome())
               quit = ftp.quit()
             except:
               sys.stderr.write('---WARNING---\nUnable to scan: '\
@@ -276,18 +276,17 @@ def search(reply):
     if (reply.find(player.getName()) != -1):
       player.addOneScore()
 
+def writeRoundScores():
+  leaders = sorted(players, key=lambda p: p.score, reverse=True)
+  with open('scores.csv', 'w') as file:
+    for leader in leaders:
+      file.write('{0},{1},{2}\n'.format(leader.getName(), leader.getTeam(), leader.getScore()))
+
 def writeFiles():
   leaders = sorted(players, key=lambda p: p.score, reverse=True)
   with open('scores.txt', 'w') as file:
     for leader in leaders:
       file.write('{0}\n'.format(leader))
-  with open('scores.csv', 'w') as file:
-    for leader in leaders:
-      file.write('{0},{1}'.format(leader.getName(), leader.getTeam()))
-      scores = leader.getScores()
-      for score in scores:
-        file.write(',{0}'.format(score))
-      file.write('\n')
   with open('players.config.end', 'w') as file:
     for player in players:
       file.write('{0} {1} {2}\n'.format(player.getName(), player.getTeam(), player.getIPstring()))
