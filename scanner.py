@@ -31,6 +31,7 @@ def main():
         scan()
         time.sleep(10)
         #time.sleep(60)
+        writeRoundScores() 
     except KeyboardInterrupt:
       while True:  
         userpause = input('\n\n---Game Paused---\n\n'\
@@ -53,7 +54,6 @@ def main():
         else:
           print('\n---Game Resumed---\n\n')
           break
-      writeRoundScores() 
 #-----------END MAIN------------------
 
 
