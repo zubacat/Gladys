@@ -73,7 +73,7 @@ def getOptions():
 #Resets the output files by blanking them
 def resetOutput():
   print('resetOutput')
-  reset = input('Are you sure you want to erase the output files? [y/n]')
+  reset = input('Are you sure you want to erase the output files? [y/N]')
   print('reset files ...')
 
 #---------- GET PLAYERS--------
@@ -132,7 +132,7 @@ def manuallyEnter(edit):
   #do you want to enter more players?
   #or if this is edit to you want to...
   if args.file or edit:
-    more = input('Do you want to enter more players? [y/n]: ')
+    more = input('Do you want to enter more players? [y/N]: ')
     while True:  
       if more =='y' or more == 'yes':
         p = Player()
@@ -140,7 +140,7 @@ def manuallyEnter(edit):
         p.setTeam(input('Enter Team: '))
         p.setIP(input('Enter IP: '))
         players.append(p)
-        more = input('Do you want to enter more players? [y/n]: ')
+        more = input('Do you want to enter more players? [y/N]: ')
       else:
         break
 
@@ -157,7 +157,7 @@ def manuallyEnter(edit):
 
   #if this is an edit, hey guess what?
   if edit:
-    ed = input('Do you want to edit the players? [y/n]: ')
+    ed = input('Do you want to edit the players? [y/N]: ')
     while True:
       if ed == 'y' or ed == 'yes':
         printPlayers()
@@ -173,9 +173,9 @@ def manuallyEnter(edit):
             found = True
         if not found:
           print('Sorry couldn\'t find', him)
-        ed = input('Do you want to edit more players? [y/n]: ')
+        ed = input('Do you want to edit more players? [y/N]: ')
       else:
-        see = input('Want to see the roster? [y/n]: ')
+        see = input('Want to see the roster? [y/N]: ')
         if see =='y' or see == 'yes':
           printPlayers()
         break
@@ -194,10 +194,10 @@ def deletePlayer():
         found = True
     if not found:
       print('Sorry couldn\'t find', him)
-      again = input('Try again? [y/n]')
+      again = input('Try again? [Y/n]')
       if again =='n' or again == 'no':
         break
-      see = input('Want to see the roster? [y/n]: ')
+      see = input('Want to see the roster? [y/N]: ')
       if see =='y' or see == 'yes':
         printPlayers()
 #-----------------END Delete Player-----------------
