@@ -296,7 +296,7 @@ def writeRoundScores():
       file.write('{0},{1},{2}\n'.format(leader.getName(), leader.getTeam(), leader.getScore()))
   
   boxes = sorted(players, key=lambda p: p.ip, reverse=True)
-  with open('box.cvs', 'w') as file:
+  with open('box.csv', 'w') as file:
     for box in boxes:
       if not ( box.getIP().is_loopback or\
              ( box.getIP() == ip_address('0.0.0.0'))):
