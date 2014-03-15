@@ -3,7 +3,7 @@ import sys
 import string
 from ipaddress import *
 def main():
-  print('In main')
+  print('In main, shouldnt be here')
 
 class Player:
   def __init__(self, name = None, team = None, ip = None):
@@ -13,6 +13,10 @@ class Player:
     self.ip = ip_address('0.0.0.0')
     self.score = [0]
     self.iterate = 0
+    #ftp,ssh,http are the names of the owners of the players box
+    self.ftp = 'error'
+    self.ssh = 'error'
+    self.http = 'error'
 
   def __iter__(self):
     return self
@@ -48,12 +52,21 @@ class Player:
   def setTeam(self, team):
     self.team = string.capwords(team)
 
+  def setFtp(self, ftp):
+    self.ftp = ftp
+ 
+  def setSsh(self, ssh):
+    self.ssh = ssh
+  
+  def setHttp(self, http):
+    self.http = http
+
   def setIP(self, ip):
     try:
       self.ip = ip_address(ip)
     except ValueError as err:
       sys.stderr.write('---ERROR---\n' + str(err) + '\n')
-      var = input('Would you like to correct this? [y/n]: ')
+      var = input('Would you like to correct this? [Y/n]: ')
       if var == 'n' or var == 'no':
         self.ip = ip_address('0.0.0.0') 
       else:
@@ -73,6 +86,15 @@ class Player:
 
   def getTeam(self):
     return self.team
+
+  def getFtp(self):
+    return self.ftp
+
+  def getSsh(self):
+    return self.ssh
+
+  def getHttp(self):
+    return self.http
 
   def getIP(self):
     return self.ip

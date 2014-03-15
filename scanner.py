@@ -31,7 +31,8 @@ def main():
         scan()
         time.sleep(10)
         #time.sleep(60)
-        writeRoundScores() 
+        writeRoundScores()
+        status()
     except KeyboardInterrupt:
       while True:  
         userpause = input('\n\n---Game Paused---\n\n'\
@@ -214,6 +215,13 @@ def leaderboard():
   for leader in leaders:
     print(leader)
 
+def status():
+  boxes = sorted(players, key=lambda p: p.ip, reverse=True)
+  for box in boxes:
+    if not ( box.getIP().is_loopback or\
+           ( box.getIP() == ip_address('0.0.0.0'))):
+      print('{0},{1},{2},{3}\n'.format(box.getIPstring(), box.getFtp(), box.getSsh(), box.getHttp() ))
+
 #---------SCAN-------
 #Scans the given ports
 #so far only 3 ports prog
@@ -233,7 +241,8 @@ def scan():
             #ftp
             try:
               ftp = FTP(player.getIPstring(), timeout=1)
-              search(ftp.getwelcome())
+              #set who owns that player's box (ftp)
+              player.setFtp(search(ftp.getwelcome()))
               quit = ftp.quit()
             except:
               sys.stderr.write('---WARNING---\nUnable to scan: '\
@@ -245,7 +254,7 @@ def scan():
               stream = subprocess.Popen('ssh -o ConnectTimeout=1 -o StrictHostKeyChecking=no -o PasswordAuthentication=no -o PubkeyAuthentication=no {0}'.format(player.getIPstring()) , shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
               sshbanner = stream.communicate()
               sshbanner = sshbanner[0].decode("utf-8") +' '+ sshbanner[1].decode("utf-8")
-              search(string.capwords(sshbanner))
+              player.setSsh(search(string.capwords(sshbanner)))
             except:
               sys.stderr.write('---WARNING---\nUnable to scan: '\
                   + str(player.getName()) + ' at IP: '+ str(player.getIPstring())\
@@ -258,7 +267,7 @@ def scan():
               #strip html tags
               text = re.sub(r'(<!--.*?-->|<[^>]*>)', '', html)
               cleantext = re.sub(r'\n', ' ', text)
-              search(cleantext)
+              player.setHttp(search(cleantext))
             except:
               sys.stderr.write('---WARNING---\nUnable to scan: '\
                   + str(player.getName()) + ' at IP: '+ str(player.getIPstring())\
@@ -271,16 +280,27 @@ def scan():
 #in the reply
 #this mean multiple people can get
 #points for on a machine
+#returns a list of all owners
 def search(reply):
+  owners = []
   for player in players:
     if (reply.find(player.getName()) != -1):
       player.addOneScore()
+      owners.append(player.getName())
+  return owners
 
 def writeRoundScores():
   leaders = sorted(players, key=lambda p: p.score, reverse=True)
   with open('scores.csv', 'w') as file:
     for leader in leaders:
       file.write('{0},{1},{2}\n'.format(leader.getName(), leader.getTeam(), leader.getScore()))
+  
+  boxes = sorted(players, key=lambda p: p.ip, reverse=True)
+  with open('box.cvs', 'w') as file:
+    for box in boxes:
+      if not ( box.getIP().is_loopback or\
+             ( box.getIP() == ip_address('0.0.0.0'))):
+        file.write('{0},{1},{2},{3}\n'.format(box.getIPstring(), box.getFtp(), box.getSsh(), box.getHttp() ))
 
 def writeFiles():
   leaders = sorted(players, key=lambda p: p.score, reverse=True)

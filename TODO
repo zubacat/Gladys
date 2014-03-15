@@ -1,0 +1,4 @@
+a player is a box at the same time
+have update at end that prints out who owns the box-'player'
+make -r reset the output files
+ummm the status message need to not print lo and 0.0.0.0 , and scores are don't match-I think it is because the ^C interuppt cuts it off from writing to the file, but does display it , so not really and error but over a long time shouldn't matter
