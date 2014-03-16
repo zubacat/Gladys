@@ -29,10 +29,10 @@ def main():
     try:
       while not pause:
         scan()
-        time.sleep(10)
-        #time.sleep(60)
         writeRoundScores()
         status()
+        time.sleep(10)
+        #time.sleep(60)
     except KeyboardInterrupt:
       while True:  
         userpause = input('\n\n---Game Paused---\n\n'\
@@ -61,10 +61,14 @@ def main():
 #---------BEGIN GETTING OPTIONS-------
 def getOptions():
   global args
-  parser = argparse.ArgumentParser(description='CDX\n  Files are automatically written out\n Files written to include ... ... ...')
-  parser.add_argument('-a', '--autorun', dest='autorun', action='store_true', default=False , help='Automatically start running - should be used with -i')
-  parser.add_argument('-i', '--input', dest='file', action='store_true', default=False , help='Read in players from \"players.config\"')
-  parser.add_argument('-r', '--reset', dest='reset', action='store_true', default=False, help='Resets all output files')
+  parser = argparse.ArgumentParser(description='CDX\n  Files are automatically\
+        `  written out\n Files written to include ... ... ...')
+  parser.add_argument('-a', '--autorun', dest='autorun', action='store_true',\
+          default=False , help='Automatically start running - should be used with -i')
+  parser.add_argument('-i', '--input', dest='file', action='store_true',\
+          default=False , help='Read in players from \"players.config\"')
+  parser.add_argument('-r', '--reset', dest='reset', action='store_true',\
+          default=False, help='Resets all output files')
 # parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False, help='Turn on Verbose Output')
   parser.add_argument('--version', action='version', version='%(prog)s 2.0 -- the uprgade from BASH')
   args = parser.parse_args()
@@ -216,11 +220,22 @@ def leaderboard():
     print(leader)
 
 def status():
+  localtime = time.asctime( time.localtime(time.time()))
   boxes = sorted(players, key=lambda p: p.ip, reverse=True)
+  print('Time: {0}'.format(localtime))
   for box in boxes:
     if not ( box.getIP().is_loopback or\
            ( box.getIP() == ip_address('0.0.0.0'))):
-      print('{0},{1},{2},{3}\n'.format(box.getIPstring(), box.getFtp(), box.getSsh(), box.getHttp() ))
+      print('Box: {0}\nFTP owners: {1}\nSSH owners: {2}\nHTTP owners: {3}\n'\
+           .format(box.getIPstring(), box.getFtp(), box.getSsh(), box.getHttp() ))
+
+  with open('box.csv', 'a') as file:
+    file.write('Time: {0}\n'.format(localtime))
+    for box in boxes:
+      if not ( box.getIP().is_loopback or\
+             ( box.getIP() == ip_address('0.0.0.0'))):
+        file.write('{0},{1},{2},{3}\n'.format(box.getIPstring(), box.getFtp(),\
+             box.getSsh(), box.getHttp() ))
 
 #---------SCAN-------
 #Scans the given ports
@@ -251,7 +266,10 @@ def scan():
           if port == 22:
             #ssh
             try:
-              stream = subprocess.Popen('ssh -o ConnectTimeout=1 -o StrictHostKeyChecking=no -o PasswordAuthentication=no -o PubkeyAuthentication=no {0}'.format(player.getIPstring()) , shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+              stream = subprocess.Popen('ssh -o ConnectTimeout=1 -o StrictHostKeyChecking=no\
+                       -o PasswordAuthentication=no -o PubkeyAuthentication=no {0}'\
+                       .format(player.getIPstring()) , shell=True, stdout=subprocess.PIPE,\
+                       stderr=subprocess.PIPE)
               sshbanner = stream.communicate()
               sshbanner = sshbanner[0].decode("utf-8") +' '+ sshbanner[1].decode("utf-8")
               player.setSsh(search(string.capwords(sshbanner)))
@@ -267,7 +285,7 @@ def scan():
               #strip html tags
               text = re.sub(r'(<!--.*?-->|<[^>]*>)', '', html)
               cleantext = re.sub(r'\n', ' ', text)
-              player.setHttp(search(cleantext))
+              player.setHttp(search(string.capwords(cleantext)))
             except:
               sys.stderr.write('---WARNING---\nUnable to scan: '\
                   + str(player.getName()) + ' at IP: '+ str(player.getIPstring())\
@@ -295,13 +313,6 @@ def writeRoundScores():
     for leader in leaders:
       file.write('{0},{1},{2}\n'.format(leader.getName(), leader.getTeam(), leader.getScore()))
   
-  boxes = sorted(players, key=lambda p: p.ip, reverse=True)
-  with open('box.csv', 'w') as file:
-    for box in boxes:
-      if not ( box.getIP().is_loopback or\
-             ( box.getIP() == ip_address('0.0.0.0'))):
-        file.write('{0},{1},{2},{3}\n'.format(box.getIPstring(), box.getFtp(), box.getSsh(), box.getHttp() ))
-
 def writeFiles():
   leaders = sorted(players, key=lambda p: p.score, reverse=True)
   with open('scores.txt', 'w') as file:
