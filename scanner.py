@@ -4,6 +4,7 @@ from ipaddress import *
 import argparse
 import sys
 import re
+import os
 import time
 import socket
 import string
@@ -40,6 +41,7 @@ def main():
                           'Enter \'l\' to see the leaderboard\n'\
                           'Enter \'e\' to edit or add a player\n'\
                           'Enter \'d\' to delete a player\n'\
+                          'Enter \'r\' to reset output files\n'\
                           'Enter anything else to continue: ')
         if userpause == 'q':
           pause = True
@@ -52,6 +54,8 @@ def main():
           manuallyEnter(True)
         elif userpause == 'd':
           deletePlayer()
+        elif userpause == 'r':
+          resetOutput()
         else:
           print('\n---Game Resumed---\n\n')
           break
@@ -77,9 +81,10 @@ def getOptions():
 #--------RESET OUTPUT FILES--------
 #Resets the output files by blanking them
 def resetOutput():
-  print('resetOutput')
-  reset = input('Are you sure you want to erase the output files? [y/N]')
-  print('reset files ...')
+  if os.path.isfile('./box.csv'):
+    reset = input('Are you sure you want to erase the output files? [y/N]')
+    if reset == 'y' or reset =='yes':
+      os.remove('./box.csv')
 
 #---------- GET PLAYERS--------
 #reads in the player file players.config

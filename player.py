@@ -14,9 +14,9 @@ class Player:
     self.score = [0]
     self.iterate = 0
     #ftp,ssh,http are the names of the owners of the players box
-    self.ftp = 'error'
-    self.ssh = 'error'
-    self.http = 'error'
+    self.ftp = [] 
+    self.ssh = []
+    self.http = []
 
   def __iter__(self):
     return self
