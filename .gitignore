@@ -4,6 +4,7 @@ scratch/
 scores.txt
 players.config.*
 *.csv
+chart.html
 #Gedit, vim crap for saving
 *~
 *.swo

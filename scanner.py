@@ -31,6 +31,7 @@ def main():
       while not pause:
         scan()
         writeRoundScores()
+        writeHTML()
         status()
         time.sleep(10)
         #time.sleep(60)
@@ -109,7 +110,7 @@ def getPlayers():
           
           except IndexError as err:
           #only name arguments given no team -- assume whitecell
-            p.team = 'white'
+            p.team = 'White'
             sys.stderr.write('---WARNING---\nNo Team given for Player: '
                              + str(p.name) + '\nSetting to White\n')
           try:
@@ -242,12 +243,58 @@ def status():
         file.write('{0},{1},{2},{3}\n'.format(box.getIPstring(), box.getFtp(),\
              box.getSsh(), box.getHttp() ))
 
+def writeHTML():
+  part1html = '''<html>
+  <head>
+    <script type="text/javascript" src="./js/jsapi"></script>
+    <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['IDK what this is', 'Player'],'''
+  part3html = '''          ]);
+
+        var options = {
+          title: 'Scores',
+          hAxis: {title: 'Player', titleTextStyle: {color: 'black'}}
+          };
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+          chart.draw(data, options);
+          }
+    </script>
+  </head>
+  <body>
+    <div id="chart_div" style="width: auto; height: auto;"></div>
+  </body>
+</html>'''
+
+  middlearray = formatarray()
+
+  html = part1html + middlearray + part3html
+  #print(html)
+
+  with open('chart.html', 'w') as file:
+    file.write('{0}'.format(html))
+
+def formatarray():
+  array = []
+  for player in players:
+    #if not the last player in the list
+    if player is not players[-1]:
+      array.append('[\'{0}\',{1}],\n'.format(player.getName(), player.getScore()))
+    else:
+      # if last don't add the comma
+      array.append('[\'{0}\',{1}]\n'.format(player.getName(), player.getScore()))
+
+  s = ''.join(array)
+  return s
+
+
 #---------SCAN-------
 #Scans the given ports
 #so far only 3 ports prog
-#FTP should probably use netcat
-#or a read ftp client
-#the socket doesn't always work...
 def scan():
   ports = (21, 22, 80)
   for player in players:
