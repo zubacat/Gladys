@@ -246,6 +246,7 @@ def status():
 def writeHTML():
   part1html = '''<html>
   <head>
+  <meta http-equiv="refresh" content="60">
     <script type="text/javascript" src="./js/jsapi"></script>
     <script type="text/javascript">
       google.load("visualization", "1", {packages:["corechart"]});
