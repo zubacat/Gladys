@@ -306,6 +306,7 @@ def scan():
         for port in ports:
           if port == 21:
             #ftp
+            player.setFtp([])
             try:
               ftp = FTP(player.getIPstring(), timeout=1)
               #set who owns that player's box (ftp)
@@ -317,6 +318,7 @@ def scan():
                   + ':' + str(port)  + '\n')
           if port == 22:
             #ssh
+            player.setSsh([])
             try:
               stream = subprocess.Popen('ssh -o ConnectTimeout=1 -o StrictHostKeyChecking=no\
                        -o PasswordAuthentication=no -o PubkeyAuthentication=no {0}'\
@@ -331,6 +333,7 @@ def scan():
                   + ':' + str(port)  + '\n')
 
           if port ==80:
+            player.setHttp([])
             try:        
               http = urllib.request.urlopen('http://{0}'.format(player.getIPstring()), None, 1)
               html = http.read().decode('utf-8')
