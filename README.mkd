@@ -1,26 +1,24 @@
-Scanner 2.0 -- The Upgrade from BASH
+#Scanner 2.0 -- The Upgrade from BASH
 
 Press Ctrl-c to pause the scoring engine.
 
-DEPENDINCIES:
+##DEPENDINCIES:
 Uses Python3 - 3.3.1
 Uses only shipped with libs from Python3
 The SSH scanner uses the OpenSSH client.
 And this it should be pathed as 'ssh'
 
-PURPOSE:
+##PURPOSE:
 To scan IP addresses parsing the returned banner looking for players names.
 To add points to these players score
 
-DESIGN:
-This program was designed for CDX
-
-AUTHOR:
+##AUTHOR:
 Trevor Vranicar
 
+##HELP
 Running scanner.py -h shows all the options for this program.
 
-CAPABILITIES:
+##CAPABILITIES:
 This program is able to take take multiple players and teams, scan their given IP addresses and check to see if any of the player's names are included in the returned text.
 
 Starting from the beginning this program is able to read in a 'players.config' file with all the players, team, and IP specified.
@@ -36,11 +34,9 @@ This can allow multiple TEAMS to be scanned invalid IP's will be set to 0.0.0.0,
 
 The program will run "indefinatly" until you pause it with Ctrl-c
 
-SHORTFALLS:
+##SHORTFALLS:
 Right now the scanner only scans ports 21,22,80.
 I will add more as it develops.
-I need to switch the FTP scanner to probably be a nc or ftp client sub process like ssh is.
-Sometimes the raw socket recv() closes before all the ftp banner text arrives, and it screws up the score some.
 
 BUGS:
 None that I know but I am sure there will be some.
